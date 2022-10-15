@@ -4,6 +4,7 @@ int main()
 {
     int number = 10;           // Storing whole numbs 10
     double decimal = 13.12;    // Storing decimal numbers 3.12
+    float flotingpoint = 9.23; // Storing decimal numbers with less pressision 
     char text = 'B';           // Storing individual characters 'A'
     std::string str = "Hello"; // Storing strings
     bool YesNo = true;         // Storing true or false
