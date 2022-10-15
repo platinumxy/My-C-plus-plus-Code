@@ -3,12 +3,12 @@
 
 int main()
 {
-    // max and min are included 
+    // max and min are included
 
     /* Cmath adds mathmatical functions eg
-    sqrt(x)         Returns the square root of x 
-    round(x)        Returns x rounded 
-    log(x)          Returns the natural logarithom of x 
+    sqrt(x)         Returns the square root of x
+    round(x)        Returns x rounded
+    log(x)          Returns the natural logarithom of x
     abs(x)	        Returns the absolute value of x
     acos(x)	        Returns the arccosine of x
     asin(x)	        Returns the arcsine of x
