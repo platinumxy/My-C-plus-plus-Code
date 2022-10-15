@@ -34,5 +34,8 @@ int main()
     || 	Logical or	    Returns true if one of the statements is true	            x < 5 || x < 4	
     !	Logical not	    Reverse the result, returns false if the result is true	    !(x < 5 && x < 10)
     */
+
+    //WARNING + is for strings and it so 10+20=30 and "10"+"20"="1020" 
+
     return 0;
 }
