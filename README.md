@@ -1,2 +1,2 @@
-# Learning C plus plus
+# My C++
  My atempt to learn C++
