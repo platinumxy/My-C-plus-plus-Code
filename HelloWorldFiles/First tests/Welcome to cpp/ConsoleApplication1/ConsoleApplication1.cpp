@@ -15,7 +15,6 @@ const int DEFAULTAGE = 10;
 const string DEFAULTFNAME = "John";
 const string DEFAULTLNAME = "Doe";
 
-
 class person
 {
 public:
@@ -30,87 +29,35 @@ public:
     };
 };
 
-struct actionsMap {
+struct actionsMap
+{
     string message;
-    int (*command)(person); //note this requires that the functions return 0
+    int (*command)(person&); //note this requires that the functions return a status code
 };
 
-void clearInputStream()
-{
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-}
+void clearInputStream();
+void lower(string& str);
+void upper(string& str);
+void titleCase(string& str);
 
-void lower(string& str)
-{
-    transform(str.begin(), str.end(), str.begin(), ::tolower);
-}
+int enterMatix(person& pers) ;
+int addFunFact(person & pers) ;
+int revealKnowledge(person& pers);
+int getActions(vector<actionsMap> acts);
+int quit(person& pers);
 
-void upper(string& str)
-{
-    transform(str.begin(), str.end(), str.begin(), ::toupper);
-};
 
-void titleCase(string& str)
-{
-    struct local // there is no local variables in cpp so we need to create a class (local)
-    {
-        static char upperLetter(char letter)
-        {
-            return toupper(letter);
-        }
-        static char lowerLetter(char letter)
-        {
-            return tolower(letter);
-        }
-    };
-    for (int i = 0; str[i] != '\0'; i++)
-    {
-        if (i == 0)
-        {
-            str[i] = local::upperLetter(str[i]);
-        }
-        else if (str[i - 1] == ' ')
-        {
-            str[i] = local::upperLetter(str[i]);
-        }
-        else
-        {
-            str[i] = local::lowerLetter(str[i]);
-        }
-    }
-}
-
-int enterMatix(person pers) {
-    string message = "Welcome to the Matrix "+pers.fname;
-    const int MESSLEN = message.length();
-    string finishedMessage = message;
-    for (int i = 0; i < MESSLEN; i++) {
-        finishedMessage[i] = ' ';
-    }
-    for (int i = 0; i < MESSLEN; i++) {
-        finishedMessage[i] = message[i];
-        cout << "\r" << finishedMessage;
-        this_thread::sleep_for(chrono::milliseconds(100));
-    }
-    return 0;
-}
-
-int addFunFact(person pers) {
-    cout << pers.fname + " please could you enter a fun fact about youself on a single line:";
-    string funcFact;
-    getline(cin, funcFact);
-}
 
 int main()
 {
 
-    actionsMap acts[5] = { 
+    vector<actionsMap> acts = {
         {"Enter the matrix", enterMatix},
-        {"", },
-        {"", },
+        {"Reveal the programs knowledge of you", revealKnowledge},
+        {"Give the program a fun fact", addFunFact},
+        {"Quit the program", quit}
+        
     };
-    acts;
-
     cout << "Please enter your full name : ";
     string fname = "", lname = "";
     while (fname == "" && lname == "") {
@@ -122,26 +69,109 @@ int main()
     titleCase(lname);
 
     int age = 0;
-    while (age == 0)
-    {
+    while (age == 0){
         cout << "Please enter your age : ";
         cin >> age;
     }
-    person p1(fname, lname, age);
+    person user(fname, lname, age);
      
-    enterMatix(p1);
-
+    int statusCode = 0;
+    while (statusCode == 0) {
+        cout << endl;//make it look nice
+        statusCode = acts[getActions(acts)].command(user);
+    }
     return 0;
 }
 
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+void clearInputStream(){
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+void lower(string& str){
+    transform(str.begin(), str.end(), str.begin(), ::tolower);
+}
+
+void upper(string& str){
+    transform(str.begin(), str.end(), str.begin(), ::toupper);
+};
+
+void titleCase(string& str){
+    struct local { // there is no local variables in cpp so we need to create a class (local)
+        static char upperLetter(char letter){
+            return toupper(letter);
+        }
+        static char lowerLetter(char letter){
+            return tolower(letter);
+        }
+    };
+    for (int i = 0; str[i] != '\0'; i++){
+        if (i == 0) 
+            str[i] = local::upperLetter(str[i]);
+        
+        else if (str[i - 1] == ' ')
+            str[i] = local::upperLetter(str[i]);
+        
+        else
+            str[i] = local::lowerLetter(str[i]);
+        
+    }
+}
+
+int enterMatix(person& pers) {
+    string message = "Welcome to the Matrix "+pers.fname;
+    const size_t MESSLEN = message.length();
+    string finishedMessage = message;
+    for (int i = 0; i < MESSLEN; i++) finishedMessage[i] = ' ';
+
+    for (int i = 0; i < MESSLEN; i++) {
+        finishedMessage[i] = message[i];
+        cout << "\r" << finishedMessage;
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+    cout << endl;
+    return 0;
+}
+
+int addFunFact(person& pers) {
+    cout << pers.fname + " please could you enter a fun fact on the line bellow:" << endl;
+    string funcFact;
+    getline(cin, funcFact);
+    pers.funFacts.push_back(funcFact);
+    return 0;
+}
+
+int revealKnowledge(person& pers) {
+    cout << "Your Name Is : " << pers.fname << " " << pers.lname << endl;
+    cout << "You are aged : " << pers.age << endl;
+    if (pers.funFacts.size() == 0) 
+        cout << "And I know no fun facts about you" << endl;
+    else {
+        cout << "And here's the facts you've told me:" << endl;
+        for (int i = 0; i < pers.funFacts.size(); i++) 
+            cout << i + 1 << ". " << pers.funFacts[i] << endl;
+    }
+    return 0;
+}
+
+int getActions(vector<actionsMap> acts){
+    int index = -1;
+    size_t lenActs = acts.size();
+    while (index == -1) {
+        cout << "Enter the index of the command you want to use" << endl;
+        for (int i = 0; i < lenActs; i++) {
+            cout << i + 1 << ". " << acts[i].message << endl;
+        }
+        cin >> index;
+        if (index <= 0 || index > lenActs) {
+            index = -1;
+        }
+    }
+    clearInputStream();
+    return index - 1;
+}
+
+int quit(person& pers) {
+    return 1;
+}
