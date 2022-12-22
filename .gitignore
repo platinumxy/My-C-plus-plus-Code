@@ -1,4 +1,10 @@
 
 .vscode/
 .vs/
+x64/
 *.exe
+*.sln
+*.vcxpro
+*.filters
+*.user
+*.vcxproj
