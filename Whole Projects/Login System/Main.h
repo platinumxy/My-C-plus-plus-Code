@@ -1,12 +1,13 @@
 #pragma once
 
-void getAction(unsigned int& action); // Main.cpp
+void getAction(const std::vector<std::string>& options, unsigned int& action); // Main.cpp
 int mainActionLoop(std::vector<std::string>& users, const std::string& savePath); // Main.cpp
-
+void unlockedUsersAction(std::vector<std::string>& users, const std::string& savePath); // Main.cpp
 
 std::string getPath(); // FileManager.cpp
-
 std::vector<std::string> filesInFolder(const std::string& path); // FileManager.cpp
+std::vector<std::string> filteredFilesInFolder(const std::string& path); // FileManager.cpp
+
 void stripInvalidFilesAndPaths(std::vector<std::string>& files); // FileManager.cpp 
 std::vector<std::string> unlockedFiles(std::vector<std::string> files); //FileManager.cpp
 

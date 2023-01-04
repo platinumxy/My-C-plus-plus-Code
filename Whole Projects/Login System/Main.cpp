@@ -5,12 +5,10 @@
 int main() {
 	const std::string saveFilePath = getPath();
 	
-	std::vector<std::string> users = filesInFolder(saveFilePath);
-	
-	stripInvalidFilesAndPaths(users);
-	
-	do {
-		std::cout << std::endl; //DRY way to loop over main action loop and add a line break before hand
+	std::vector<std::string> users;
+	do {//DRY way to loop over main action loop update variables and add line breaks 
+		users = filteredFilesInFolder(saveFilePath); // update incase files have been deleted 
+		std::cout << std::endl; 
 	} while (mainActionLoop(users, saveFilePath) == 0);
 
 	return 0;
@@ -18,48 +16,67 @@ int main() {
 
 int mainActionLoop(std::vector<std::string>& users, const std::string& savePath)
 {
-	std::vector<std::string> unlockedUsers(0); //insilisd incase needed in switch   
+	; //insilisd incase needed in switch   
 	unsigned int action = 0;
-	getAction(action);
+	getAction({ "Login", 
+		"Sign up", 
+		"Open Unlocked files (note unlocked files can be opened outside of this aplication)", 
+		"Quit" }, action);
 	switch (action) {
+	case 0:
+		break;
 	case 1:
-
 		break;
 	case 2:
+		unlockedUsersAction(users, savePath);
 		break;
 	case 3:
-		unlockedUsers = unlockedFiles(users);
-		if (unlockedUsers.size() == 0) {
-			std::cout << "No Unlocked Users" << "\n";
-			break;
-		}
-		
-		for (std::string& user : unlockedUsers) {
-			std::string tmpUser = user;
-			tmpUser.erase(0, savePath.size()); // remove save file path
-			tmpUser.erase(tmpUser.find(unlockeduserExt), unlockeduserExt.size()); // remove save file extention 
-			std::cout << tmpUser << "\n";
-		}
-		break;
-	case 4:
-		return 1;
+		return 1; // Break out of main loop
 	}
 	return 0;
 }
 
-void getAction(unsigned int& action)
+void unlockedUsersAction(std::vector<std::string>& users, const std::string& savePath)
 {
+	std::vector<std::string> unlockedUsers = unlockedFiles(users);
+	if (unlockedUsers.size() == 0) {
+		std::cout << "No Unlocked Users" << "\n";
+		return;
+	}
+
+	std::cout << "Select a user to open from the bellow list :\n";
+	for (size_t i = 0; i < unlockedUsers.size(); i++) {
+		std::string tmpUser = unlockedUsers[i];
+		tmpUser.erase(0, savePath.size()+1); // remove save file path
+		tmpUser.erase(tmpUser.find(unlockeduserExt), unlockeduserExt.size()); // remove save file extention 
+		std::cout << i+1 << ". " << tmpUser << "\n";
+	}
+
+	unsigned int userChoice;
+	while (true) {
+		std::cin.ignore();
+		std::cin >> userChoice;
+		if (userChoice > unlockedUsers.size() || userChoice <= 0) {
+			std::cout << "Please enter a valid index :" << std::endl;
+		}
+		else { userChoice--; break; }
+	}
+
+
+
+}
+
+void getAction(const std::vector<std::string>& options, unsigned int& action){
 	while (action == 0) {
-		std::cout << "Select a option from the bellow list :\n"
-			<< "1. Login \n"
-			<< "2. Sign up \n"
-			<< "3. Open Unlocked files \n"
-			<< "4. Quit" << std::endl;
+		std::cout << "Select a option from the bellow list :\n";
+		for (int i = 0; i < options.size(); i++) 
+			std::cout << i + 1 << options[i] << "\n";
 		std::cin >> action;
-		if (action > 4 || action < 1) {
+		if (action > options.size() || action < 1) {
 			action = 0;
 		}
 	}
+	action--;
 }
 
 
