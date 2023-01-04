@@ -25,7 +25,7 @@ Output:
 
 const int PRIME_CONST = 31;
 
-int hashFunction(const std::string& key) {
+double hashFunction(const std::string& key) {
 	double hashCode = 0;
 	for (size_t i = 0; i < key.length(); i++) {
 		hashCode += key[i] * pow(PRIME_CONST, i);
@@ -38,8 +38,9 @@ void encryptData(const std::string& key, std::string& data) {
 	std::string keyHash = std::to_string(hashFunction(key));
 
 	//while the length of the extended key is to small to contain the data and the string representation of the extended keys length and the md5 length
-	while (extendedKey.length() < (std::to_string(extendedKey.length())).length() + keyHash.length())
+	while (extendedKey.length() < (data + std::to_string(extendedKey.length())).length() + keyHash.length())
 		extendedKey += key; 
+
 	data = std::to_string(extendedKey.length()) + keyHash + data;
 
 	for (size_t i = 0; i < data.length(); i++)
