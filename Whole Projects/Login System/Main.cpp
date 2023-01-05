@@ -9,26 +9,24 @@ int main() {
 	do {//DRY way to loop over main action loop update variables and add line breaks 
 		users = filteredFilesInFolder(saveFilePath); // update incase files have been deleted 
 		std::cout << std::endl; 
-	} while (mainActionLoop(users, saveFilePath) == 0);
+	} while (mainActionLoop(saveFilePath, users) == 0);
 
 	return 0;
 }
 
-int mainActionLoop(std::vector<std::string>& users, const std::string& savePath)
-{
-	; //insilisd incase needed in switch   
+int mainActionLoop(const std::string& savePath, std::vector<std::string>& users) {
 	unsigned int action = 0;
 	getAction({ "Login", 
 		"Sign up", 
 		"Open Unlocked files (note unlocked files can be opened outside of this aplication)", 
-		"Quit" }, action);
+		"Quit" }, action, "Select a option from the bellow list :");
 	switch (action) {
 	case 0:
 		break;
 	case 1:
 		break;
 	case 2:
-		unlockedUsersAction(users, savePath);
+		unlockedUsersAction(savePath, users);
 		break;
 	case 3:
 		return 1; // Break out of main loop
@@ -36,8 +34,7 @@ int mainActionLoop(std::vector<std::string>& users, const std::string& savePath)
 	return 0;
 }
 
-void unlockedUsersAction(std::vector<std::string>& users, const std::string& savePath)
-{
+void unlockedUsersAction(const std::string& genericPath, std::vector<std::string>& users) {
 	std::vector<std::string> unlockedUsers = unlockedFiles(users);
 	if (unlockedUsers.size() == 0) {
 		std::cout << "No Unlocked Users" << "\n";
@@ -47,7 +44,7 @@ void unlockedUsersAction(std::vector<std::string>& users, const std::string& sav
 	std::cout << "Select a user to open from the bellow list :\n";
 	for (size_t i = 0; i < unlockedUsers.size(); i++) {
 		std::string tmpUser = unlockedUsers[i];
-		tmpUser.erase(0, savePath.size()+1); // remove save file path
+		tmpUser.erase(0, genericPath.size()+1); // remove save file path
 		tmpUser.erase(tmpUser.find(unlockeduserExt), unlockeduserExt.size()); // remove save file extention 
 		std::cout << i+1 << ". " << tmpUser << "\n";
 	}
@@ -62,15 +59,17 @@ void unlockedUsersAction(std::vector<std::string>& users, const std::string& sav
 		else { userChoice--; break; }
 	}
 
-
+	do {
+		std::cout << std::endl;
+	} while (unlockedFileManager(unlockedUsers[userChoice]) == 0);
 
 }
 
-void getAction(const std::vector<std::string>& options, unsigned int& action){
+void getAction(const std::vector<std::string>& options, unsigned int& action, const std::string& message){
 	while (action == 0) {
-		std::cout << "Select a option from the bellow list :\n";
-		for (int i = 0; i < options.size(); i++) 
-			std::cout << i + 1 << options[i] << "\n";
+		std::cout << message << "\n";
+		for (unsigned i = 0; i < options.size(); i++) 
+			std::cout << i + 1 << ". " << options[i] << "\n";
 		std::cin >> action;
 		if (action > options.size() || action < 1) {
 			action = 0;

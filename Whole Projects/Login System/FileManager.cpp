@@ -165,3 +165,24 @@ bool lockFile(const std::string& path, const std::string& key) {
 
 	return true;
 }
+
+void printFile(const std::vector<std::string>& lineBrokenFileData) {
+	struct local {
+		static void numSpacesForEverypowerOfTen(int size, std::vector<std::string>& numSpaces) {
+			size = std::to_string(size).length();
+			for (int i = size; i > 0; i--) {
+				std::string tmp = " ";
+				for (int j = 0; j < i; j++) tmp += " ";
+				numSpaces.push_back(tmp);}}
+
+		static void numSpacesShow(const int& rowNum, const std::vector<std::string>& spacesPerPowerOfTen, std::string& spaces) 
+			{ spaces = spacesPerPowerOfTen[std::to_string(rowNum).length() - 1]; }};
+
+	std::vector<std::string> spaceForEachPwTen;
+	local::numSpacesForEverypowerOfTen(lineBrokenFileData.size() + 1, spaceForEachPwTen);
+
+	for (unsigned i = 0; i < lineBrokenFileData.size(); i++) {
+		std::string spaces;
+		local::numSpacesShow(i + 1, spaceForEachPwTen, spaces);
+		std::cout << i + 1 << spaces << "- " << lineBrokenFileData[i] << "\n"; }
+}

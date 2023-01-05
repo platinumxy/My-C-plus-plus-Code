@@ -1,8 +1,8 @@
 #pragma once
 
-void getAction(const std::vector<std::string>& options, unsigned int& action); // Main.cpp
-int mainActionLoop(std::vector<std::string>& users, const std::string& savePath); // Main.cpp
-void unlockedUsersAction(std::vector<std::string>& users, const std::string& savePath); // Main.cpp
+void getAction(const std::vector<std::string>& options, unsigned int& action, const std::string& message); // Main.cpp
+int mainActionLoop(const std::string& savePath, std::vector<std::string>& users); // Main.cpp
+void unlockedUsersAction(const std::string& genericPath, std::vector<std::string>& users); // Main.cpp
 
 std::string getPath(); // FileManager.cpp
 std::vector<std::string> filesInFolder(const std::string& path); // FileManager.cpp
@@ -15,3 +15,4 @@ void encryptData(const std::string& key, std::string& data); // Encryption.cpp
 bool decryptData(const std::string& key, const std::string& data, std::string& output); // Encryption.cpp
 
 bool ValidLogIn(const std::string& path, const std::string& decriptionKey, std::string& output); // LoginManager.cpp
+int unlockedFileManager(const std::string& unlockedFilePath); //LoginManager.cpp
