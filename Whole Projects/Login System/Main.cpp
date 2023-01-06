@@ -1,7 +1,5 @@
 #include "Header.h"
 #include "Main.h"
-
-
 int main() {
 	const std::string saveFilePath = getPath();
 	
@@ -54,7 +52,7 @@ void unlockedUsersAction(const std::string& genericPath, std::vector<std::string
 		std::cin.ignore();
 		std::cin >> userChoice;
 		if (userChoice > unlockedUsers.size() || userChoice <= 0) {
-			std::cout << "Please enter a valid index :" << std::endl;
+			std::cout << "Please enter a valid index :\n";// << std::endl;
 		}
 		else { userChoice--; break; }
 	}
@@ -66,13 +64,22 @@ void unlockedUsersAction(const std::string& genericPath, std::vector<std::string
 }
 
 void getAction(const std::vector<std::string>& options, unsigned int& action, const std::string& message){
+	std::string input;
+	std::cout << message << "\n";
+	for (unsigned i = 0; i < options.size(); i++)
+		std::cout << i + 1 << ". " << options[i] << "\n";
 	while (action == 0) {
-		std::cout << message << "\n";
-		for (unsigned i = 0; i < options.size(); i++) 
-			std::cout << i + 1 << ". " << options[i] << "\n";
-		std::cin >> action;
+
+		std::cin >> input; 
+
+		try  // String to int
+			{ action = std::stoi(input); }
+		catch (...) 
+			{ action = 0; }
+		
 		if (action > options.size() || action < 1) {
 			action = 0;
+			std::cout << std::endl;
 		}
 	}
 	action--;
