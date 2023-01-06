@@ -145,15 +145,16 @@ bool lockFile(const std::string& path, const std::string& key) {
 		encryptData(key, encryptedContent);
 	}
 	catch (...) {
-		std::cout << "Unable to open locked file" << "\n"
-			<< "File may be open in other another apllication" << "\n"
+		std::cout << "Unable to open locked file reasons may be :" << "\n"
+			<< "File is open in another apllication" << "\n"
 			<< "Aplication may not have high enough privlages to write to the file" << "\n";
 		return false;
 	}
 	try {
 		write(encryptedContent, path);
 		if (std::rename(path.c_str(), newPath.c_str()) != 0) {
-			std::cout << "Contents was unlocked But Was unable to change file extention\n"; return false;
+			std::cout << "Contents was unlocked But Was unable to change file extention\nPlease Manualy change the extention"; 
+			return false;
 		}
 	}
 	catch (...) {
