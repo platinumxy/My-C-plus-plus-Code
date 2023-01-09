@@ -2,14 +2,15 @@
 #include <sys/stat.h> // for checking pathExists 
 #include <filesystem> 
 #include <fstream>
-
+#include <algorithm> // for concatinating a string from a vector
+#include <numeric>
 namespace fs = std::filesystem;
 
 
 void encryptData(const std::string& key, std::string& data); // Encryption.cpp
 bool decryptData(const std::string& key, const std::string& data, std::string& output); // Encryption.cpp
 
-bool ValidLogIn(const std::string& path, const std::string& decriptionKey, std::string& output); // LoginManager.cpp
+bool validLogIn(const std::string& path, const std::string& decriptionKey, std::string& output); // LoginManager.cpp
 
 
 bool pathExits(const std::string& path){
@@ -68,7 +69,8 @@ std::vector<std::string> unlockedFiles(std::vector<std::string> files) {
 
 std::string open(const std::string& path) {
 	std::ifstream targetFile(path);
-	std::string output = "", line;
+	std::string output = "";
+	std::string line;
 
 	if (!targetFile.is_open()) {
 		std::error_code errorCode ;
@@ -77,7 +79,7 @@ std::string open(const std::string& path) {
 
 	while (getline(targetFile, line))
 		output += line + "\n";
-
+	targetFile.close();
 	return output;
 }
 std::vector<std::string> vectOpen(const std::string& path) {
@@ -92,6 +94,7 @@ std::vector<std::string> vectOpen(const std::string& path) {
 	while (getline(targetFile, line)) {
 		output.push_back(line);
 	}
+	targetFile.close();
 	return output;
 }
 
@@ -102,7 +105,7 @@ void write(const std::string& data, const std::string& path) {
 		throw fs::filesystem_error::filesystem_error("Error Opening Target Path", errorCode);
 	}
 
-	targetFile << data;
+	targetFile << data << std::endl;
 
 	targetFile.close();
 }
@@ -114,7 +117,7 @@ bool unlockFile(const std::string& path, const std::string& decriptionKey) {
 	newPath.erase(newPath.find(lockeduserExt), lockeduserExt.size()); // remove the file extention
 	newPath += unlockeduserExt;
 
-	if (!ValidLogIn(path, decriptionKey, fileContent)) {
+	if (!validLogIn(path, decriptionKey, fileContent)) {
 		std::cout << "Unable to log in password may be wrong" << std::endl;
 		return false;
 	}
@@ -186,4 +189,25 @@ void printFile(const std::vector<std::string>& lineBrokenFileData) {
 		std::string spaces;
 		local::numSpacesShow(i + 1, spaceForEachPwTen, spaces);
 		std::cout << i + 1 << spaces << "- " << lineBrokenFileData[i] << "\n"; }
+}
+
+bool deleteFile(const std::string& filePath) {
+	return false;
+}
+
+bool deleteLine(const std::string& filePath, const unsigned int& row) {
+	std::vector<std::string> data;
+	try { data = vectOpen(filePath); }
+	catch (fs::filesystem_error) { return false; }
+
+	data.erase(data.begin() + row);
+
+	
+	try { 
+		std::stringstream ss;
+		write(std::accumulate(data.begin(), data.end(), std::string{}), filePath);
+	}
+	catch (fs::filesystem_error) { return false; }
+
+	return true;
 }

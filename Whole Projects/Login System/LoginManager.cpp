@@ -1,26 +1,52 @@
 #include "Header.h"
 #include "LoginManager.h"
 
-bool ValidLogIn(const std::string& path, const std::string& decriptionKey, std::string& userData) {
+void getInput(std::string& string) {
+	std::getline(std::cin, string);
+	string.erase(std::remove(string.begin(), string.end(), ' '), string.end());
+	std::transform(string.begin(), string.end(), string.begin(), ::tolower);
+}
+
+bool validLogIn(const std::string& filePath, const std::string& decriptionKey, std::string& output) {
 	std::string fileData;
 
-	try { fileData = open(path); }
+	try { fileData = open(filePath); }
 	catch (const fs::filesystem_error) {
-		std::cout << "WARNING ERROR OPENING => " << path << std::endl;
+		std::cout << "WARNING ERROR OPENING => " << filePath << std::endl;
 		return false; }
 
-	if (decryptData(decriptionKey, fileData, userData))
+	if (decryptData(decriptionKey, fileData, output))
 		return true;
 	
-	userData = "";
+	output = "";
 	return false;
 }
 
+void login(const std::string& path) {
+	std::string pswrd, username, userData;
+	std::cout << "Enter Username :\n";
+	getline(std::cin, username);
+	username = path + "\\" +  username + lockeduserExt;
+
+	std::cout << "Enter Password :\n";
+	getline(std::cin, pswrd);
+
+
+	if (!pathExits(username)) {
+		std::cout << "Invalid username\n";
+		return;
+	}
+
+	if (unlockFile(username, pswrd)) {
+		do {
+			std::cout << std::endl;
+		} while (unlockedFileManager(username) == 0);
+	}
+}
 
 int unlockedFileManager(const std::string& unlockedFilePath) {
 	std::vector<std::string> lineBrokenFileData, strVecTmp;
-	std::string userName = unlockedFilePath, rawData, strTmp;
-	int intTmp;
+	std::string userName = unlockedFilePath, strTmp;
 	removePathAndFileExtention(userName , unlockeduserExt);
 
 	unsigned action = 0;
@@ -40,32 +66,57 @@ int unlockedFileManager(const std::string& unlockedFilePath) {
 	case 2: // Append new Line 
 		break;
 	case 3: // Delete line
+		std::cout << std::endl;
+		userDeleteLine(lineBrokenFileData, unlockedFilePath);
 		break;
-	case 4: // Overview File
+	case 4: // OverWrite File
 		break;
 	case 5: // Delete File 
 		std::cout << "Are you sure you want to delete " << userName << "(y/n)";
-		std::getline(std::cin, strTmp);
-		strTmp.erase(std::remove(strTmp.begin(), strTmp.end(), ' '), strTmp.end());
-		if (!(strTmp == "y" || strTmp == "yes")) break;
+		getInput(strTmp);
+		if (!(strTmp == "y")) break;
 
 		std::cout << "ALL DATA WILL BE LOST FOREVER continue (y/n)" << std::endl;
-		std::getline(std::cin, strTmp);
-		strTmp.erase(std::remove(strTmp.begin(), strTmp.end(), ' '), strTmp.end());
-		if (!(strTmp == "y" || strTmp == "yes")) break;
+		getInput(strTmp);
+		if (!(strTmp == "y")) break;
 
 		if (deleteFile(unlockedFilePath)) {
 			return 1;
 		}
-
 		break;
 	case 6: // Quit
 		std::cout << "Are you sure you want to quit without saving file THIS WILL LEAVE YOUR FILE EXPOSED\n" << "(y/n)" << std::endl;
-		std::cin >> strTmp;
-		std::transform(strTmp.begin(), strTmp.end(), strTmp.begin(), ::toupper);
-		if (strTmp == "Y") return 1;
+		getInput(strTmp);
+		if (strTmp == "y") return 1;
 	}
 	return 0;
+}
+
+void userDeleteLine(std::vector<std::string>& lineBrokenFileData, const std::string& unlockedFilePath)
+{
+	unsigned int targetLine = 0;
+	std::string yn;
+	lineBrokenFileData = vectOpen(unlockedFilePath); printFile(lineBrokenFileData);
+	std::cout << "Which line would you like to remove ? :\n";
+
+	std::getline(std::cin, yn);
+	try { targetLine = std::stoi(yn); }
+	catch (...) { targetLine = 0; }
+
+	if (targetLine < 1 || targetLine > lineBrokenFileData.size()) {
+		std::cout << "Invalid Line\n";
+		return;
+	}
+	targetLine--;
+	std::cout << "Are you sure you want to delete the following line (y/n):\n"
+		<< targetLine + 1 << " - " << lineBrokenFileData[targetLine] << "\n";
+	getInput(yn);
+	if (yn == "y") {
+		if (deleteLine(unlockedFilePath, targetLine))
+			std::cout << "Deletion sucessful\n";
+		else std::cout << "An error occoured try again later";
+	}
+	else std::cout << "Deletion canceld\n";
 }
 
 void removePathAndFileExtention(std::string& userName, const std::string& fileExtention)
@@ -102,9 +153,29 @@ std::string getPword(const std::string& fileName) {
 	std::getline(std::cin, pword);
 	std::cout << "Re-enter the password :" << std::endl;
 	std::getline(std::cin, pwordReEnter);
-	if (pword == pwordReEnter) {
+	if (!(pword == pwordReEnter)) {
 		std::cout << "Passowords do not match" << std::endl;
 		return getPword(fileName);
 	}
 	return pword;
+}
+
+bool signUp(const std::string& basePath, std::string& newName ) {
+	std::cout << "Enter your username :" << std::endl;
+	std::getline(std::cin, newName);
+	newName = basePath + "\\" + newName;
+	if (pathExits(newName + lockeduserExt) || pathExits(newName + unlockeduserExt)) {
+		std::cout << "Username Already Taken";
+		return false;
+	} 
+	newName = newName + unlockeduserExt;
+	try { // create the file extention 
+		std::ofstream newFile (newName);
+		newFile.close();
+	}
+	catch (...) {
+		std::cout << "Unable to create file try agian later";
+		return false;
+	}
+	return true;
 }

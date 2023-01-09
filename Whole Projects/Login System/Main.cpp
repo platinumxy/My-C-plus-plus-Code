@@ -19,14 +19,18 @@ int mainActionLoop(const std::string& savePath, std::vector<std::string>& users)
 		"Open Unlocked files (note unlocked files can be opened outside of this aplication)", 
 		"Quit" }, action, "Select a option from the bellow list :");
 	switch (action) {
-	case 0:
+	case 0: // Login
+		login(savePath);
 		break;
-	case 1:
+	case 1: // Sign up
+		{std::string newUser;
+		if (signUp(savePath, newUser)) 
+			{do {std::cout << std::endl;} while (unlockedFileManager(newUser) == 0);}}
 		break;
-	case 2:
+	case 2: // Unlocked Users 
 		unlockedUsersAction(savePath, users);
 		break;
-	case 3:
+	case 3: // Quit
 		return 1; // Break out of main loop
 	}
 	return 0;
@@ -70,7 +74,8 @@ void getAction(const std::vector<std::string>& options, unsigned int& action, co
 		std::cout << i + 1 << ". " << options[i] << "\n";
 	while (action == 0) {
 
-		std::cin >> input; 
+		getline(std::cin, input); 
+		input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
 
 		try  // String to int
 			{ action = std::stoi(input); }
